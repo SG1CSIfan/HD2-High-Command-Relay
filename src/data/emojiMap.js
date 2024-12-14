@@ -1,0 +1,16 @@
+module.exports = {
+    terminid: '<:TerminidDev:000000000000000001>',
+    automaton: '<:AutomatonDev:000000000000000002>',
+    friendlyKills: '<:DeadHD2Dev:000000000000000003>',
+    deaths: '<:FailedMissionDev:000000000000000004>',
+    shotsFired: '<:HD2GunDev:000000000000000005>',
+    shotsHit: '<:MissionCompleteDev:000000000000000006>',
+    firstColReg: '<:1stColRegPatchDev:000000000000000007>',
+    HelldiverProgressBar: '<:HelldiverProgressBarDev:000000000000000008>',
+    EmptyProgressBar: '<:EmptyProgressBarDev:000000000000000009>',
+    RequisitionSlips: '<:RequisitionSlipsDev:000000000000000010>',
+    CommonSample: '<:CommonSampleDev:000000000000000011>',
+    RareSample: '<:RareSampleDev:000000000000000012>',
+    AutomationProgressBar: '<:AutomationProgressBarDev:000000000000000013>',
+    TerminidProgressBar: '<:TerminidProgressBarDev:000000000000000014>',
+};
