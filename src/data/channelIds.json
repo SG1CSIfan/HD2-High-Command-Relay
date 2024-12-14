@@ -1,0 +1,10 @@
+{
+    "production": {
+        "mainChannelId": "123456789012345678",
+        "logChannelId": "234567890123456789"
+    },
+    "development": {
+        "mainChannelId": "987654321098765432",
+        "logChannelId": "876543210987654321"
+    }
+}

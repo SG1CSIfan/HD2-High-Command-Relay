@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@google-cloud/vision": "^4.3.2",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.11.5"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "nodemon": "^3.1.9"
+  }
+}
