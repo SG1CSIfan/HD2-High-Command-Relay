@@ -45,7 +45,7 @@ client.once('ready', async () => {
             const interval = data[scope].interval * 1000; // Convert seconds to milliseconds
 
             intervals[scope] = setInterval(() => {
-                console.log(`[INFO] Updating ${scope} embed...`);
+                //console.log(`[INFO] Updating ${scope} embed...`);
                 loadOrUpdateEmbeds(client, scope);
             }, interval);
 

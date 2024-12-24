@@ -22,14 +22,14 @@ module.exports = {
                     return interaction.editReply('Please attach an image to submit a service report.');
                 }
     
-                console.log('[DEBUG] Image URL:', imageUrl);
+                //console.log('[DEBUG] Image URL:', imageUrl);
     
                 // Fetch the member's nickname or fallback to username
                 const member = await interaction.guild.members.fetch(interaction.user.id);
                 const nickname = member?.nickname || interaction.user.username;
     
                 const extractedData = await analyzeImage(imageUrl);
-                console.log('[DEBUG] Extracted Data:', extractedData);
+                //console.log('[DEBUG] Extracted Data:', extractedData);
     
                 const report = {
                     userId: interaction.user.id,
@@ -41,7 +41,7 @@ module.exports = {
     
                 // Save or update the report in the database
                 const saveResult = await saveOrUpdateReport(report);
-                console.log('[DEBUG] Database Save Result:', saveResult);
+                //console.log('[DEBUG] Database Save Result:', saveResult);
     
                 // Add submissionCount and rowId to the report for the embed
                 report.submissionCount = saveResult.submissionCount || 1;
@@ -49,11 +49,11 @@ module.exports = {
     
                 // Generate the embed (pass the nickname here)
                 const embed = generateServiceReportEmbed(report, imageUrl, nickname);
-                console.log('[DEBUG] Generated Embed:', embed);
+                //console.log('[DEBUG] Generated Embed:', embed);
     
                 // Send the embed back to the user
                 await interaction.editReply({ embeds: [embed] });
-                console.log('[DEBUG] Embed successfully sent to the user.');
+                //console.log('[DEBUG] Embed successfully sent to the user.');
             } catch (error) {
                 console.error('[ERROR] Failed to process service report:', error);
     

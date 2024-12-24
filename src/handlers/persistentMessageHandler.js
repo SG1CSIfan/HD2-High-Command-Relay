@@ -51,7 +51,7 @@ async function readPersistentData() {
     console.log('[DEBUG] Using persistentMessage.json from:', PERSISTENT_FILE);
     try {
         const data = await fsPromises.readFile(PERSISTENT_FILE, 'utf8');
-        console.log('[DEBUG] Raw JSON Data:', data);
+        //console.log('[DEBUG] Raw JSON Data:', data);
         return JSON.parse(data);
     } catch (error) {
         console.error('[ERROR] Failed to parse persistentMessage.json:', error);
