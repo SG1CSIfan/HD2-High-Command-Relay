@@ -1,0 +1,14 @@
+{
+  "killQuota": {
+    "channelId": "",
+    "messageId": "",
+    "terminidGoal": 0,
+    "automatonGoal": 0,
+    "illuminateGoal": 0
+  },
+  "regimentEffort": {
+    "channelId": "",
+    "messageId": "",
+    "interval": 600
+  }
+}

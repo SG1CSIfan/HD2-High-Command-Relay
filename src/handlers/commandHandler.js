@@ -8,12 +8,16 @@ async function registerCommands(client) {
     const commands = [];
     const commandFiles = fs.readdirSync(path.join(__dirname, '../commands')).filter(file => file.endsWith('.js'));
 
+    // Load commands dynamically
     for (const file of commandFiles) {
         const command = require(`../commands/${file}`);
         client.commands.set(command.data.name, command);
         commands.push(command.data.toJSON());
         console.log(`[INFO] Loaded command: ${command.data.name}`);
     }
+
+    // Debugging environment variables
+    console.log('DISCORD_CLIENT_ID:', process.env.DISCORD_CLIENT_ID);
 
     const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
@@ -24,8 +28,9 @@ async function registerCommands(client) {
     console.log(`[INFO] Registering commands for guild: ${targetGuildId}`);
 
     try {
+        // Register commands to the correct guild
         await rest.put(
-            Routes.applicationGuildCommands(process.env.CLIENT_ID, targetGuildId),
+            Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, targetGuildId),
             { body: commands }
         );
         console.log(`[INFO] Successfully registered ${commands.length} commands.`);
@@ -34,16 +39,19 @@ async function registerCommands(client) {
     }
 }
 
-// Optional: Add an unregisterCommands function for cleaning up old commands
+// Optional: Unregister commands for cleaning up
 async function unregisterCommands(client) {
     const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
     const targetGuildId = process.env.DEV_MODE === 'true' ? process.env.TEST_GUILD_ID : process.env.MAIN_GUILD_ID;
 
     try {
-        const registeredCommands = await rest.get(Routes.applicationGuildCommands(process.env.CLIENT_ID, targetGuildId));
+        const registeredCommands = await rest.get(
+            Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, targetGuildId)
+        );
         console.log(`[INFO] Found ${registeredCommands.length} commands to unregister.`);
+
         for (const command of registeredCommands) {
-            await rest.delete(Routes.applicationGuildCommand(process.env.CLIENT_ID, targetGuildId, command.id));
+            await rest.delete(Routes.applicationGuildCommand(process.env.DISCORD_CLIENT_ID, targetGuildId, command.id));
             console.log(`[INFO] Deleted command: ${command.name}`);
         }
     } catch (error) {

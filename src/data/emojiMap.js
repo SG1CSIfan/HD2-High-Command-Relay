@@ -13,4 +13,5 @@ module.exports = {
     RareSample: '<:RareSampleDev:000000000000000012>',
     AutomationProgressBar: '<:AutomationProgressBarDev:000000000000000013>',
     TerminidProgressBar: '<:TerminidProgressBarDev:000000000000000014>',
+    IlluminateProgressBar: '<:IlluminateProgressBar:1317009125250564106>'
 };

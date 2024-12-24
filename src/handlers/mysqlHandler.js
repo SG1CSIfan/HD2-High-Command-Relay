@@ -87,4 +87,31 @@ async function saveOrUpdateReport(report) {
     }
 }
 
-module.exports = { saveOrUpdateReport };
+async function fetchKillStats() {
+    const [rows] = await pool.query(`
+        SELECT 
+            SUM(terminidKills) AS terminidKills,
+            SUM(automatonKills) AS automatonKills,
+            SUM(illuminateKills) AS illuminateKills
+        FROM service_reports
+    `);
+    return rows[0] || { terminidKills: 0, automatonKills: 0, illuminateKills: 0 };
+}
+
+async function fetchWarEffortTotals() {
+    const [rows] = await pool.query(`
+        SELECT 
+            SUM(terminidKills) AS terminidKills,
+            SUM(automatonKills) AS automatonKills,
+            SUM(illuminateKills) AS illuminateKills,
+            SUM(friendlyKills) AS friendlyKills,
+            SUM(deaths) AS deaths,
+            SUM(shotsFired) AS shotsFired,
+            SUM(shotsHit) AS shotsHit,
+            COUNT(*) AS totalSubmissions
+        FROM service_reports
+    `);
+    return rows[0] || {};
+}
+
+module.exports = { saveOrUpdateReport, fetchKillStats, fetchWarEffortTotals };

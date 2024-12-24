@@ -1,8 +1,20 @@
 const fs = require('fs');
 const path = require('path');
 
-const logFilePath = path.join(__dirname, '../logs/general.log');
-const errorFilePath = path.join(__dirname, '../logs/error.log');
+const logDir = path.join(__dirname, '../logs');
+const logFilePath = path.join(logDir, 'general.log');
+const errorFilePath = path.join(logDir, 'error.log');
+
+// Ensure the logs directory and files exist
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+}
+if (!fs.existsSync(logFilePath)) {
+    fs.writeFileSync(logFilePath, '');
+}
+if (!fs.existsSync(errorFilePath)) {
+    fs.writeFileSync(errorFilePath, '');
+}
 
 function log(message) {
     const timestamp = new Date().toISOString();
