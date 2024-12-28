@@ -87,9 +87,41 @@ async function getQuotaGoals() {
     }
 }
 
+async function saveQuotaGoals(terminidGoal, automatonGoal, illuminateGoal) {
+    try {
+        // Read the existing data
+        const data = await readPersistentData();
+
+        // Update the killQuota goals
+        if (!data.killQuota) data.killQuota = {};
+        data.killQuota.terminidGoal = terminidGoal;
+        data.killQuota.automatonGoal = automatonGoal;
+        data.killQuota.illuminateGoal = illuminateGoal;
+
+        // Write back the updated data
+        await writePersistentData(data);
+        console.log('[INFO] Quota goals saved successfully.');
+    } catch (error) {
+        console.error('[ERROR] Failed to save quota goals:', error);
+        throw error;
+    }
+}
+
+async function getMessageId(scope) {
+    try {
+        const data = await readPersistentData();
+        return data[scope]?.messageId || null; // Return the message ID or null if not found
+    } catch (error) {
+        console.error(`[ERROR] Failed to get message ID for ${scope}:`, error);
+        throw error;
+    }
+}
+
 module.exports = {
     saveMessageId,
     readPersistentData,
     writePersistentData,
-    getQuotaGoals
+    getQuotaGoals,
+    saveQuotaGoals,
+    getMessageId
 };

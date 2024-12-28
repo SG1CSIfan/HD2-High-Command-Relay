@@ -201,6 +201,40 @@ async function savePlayerContribution(report) {
     }
 }
 
+async function fetchUserStats(userId) {
+    try {
+        const [rows] = await pool.execute(
+            `SELECT 
+                pc.enemyKills,
+                pc.terminidKills,
+                pc.automatonKills,
+                pc.illuminateKills,
+                pc.friendlyKills,
+                pc.deaths,
+                pc.shotsFired,
+                pc.shotsHit,
+                pb.first_submission,
+                pb.discord_join_date,
+                pc.last_updated AS lastUpdated
+            FROM player_contributions pc
+                JOIN player_baseline pb ON pc.userId = pb.userId
+            WHERE pc.userId = ?
+    `,
+    [userId]
+);
+
+        if (rows.length === 0) {
+            console.log('[DEBUG] No record found for user:', userId);
+            return null; // No record found
+        }
+
+        return rows[0]; // Return the first (and only) record
+    } catch (error) {
+        console.error('[ERROR] Failed to fetch user stats:', error);
+        throw error;
+    }
+}
+
 async function fetchKillStats() {
     const [rows] = await pool.query(`
         SELECT 
@@ -233,5 +267,6 @@ module.exports = {
     fetchKillStats, 
     fetchWarEffortTotals,
     saveOrUpdateBaseline,
-    savePlayerContribution
+    savePlayerContribution,
+    fetchUserStats
  };

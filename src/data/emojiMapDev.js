@@ -1,4 +1,4 @@
-module.exports = {
+const emojiMap = {
     terminid: '<:Terminid:1318437943135965184>',
     automaton: '<:Automaton:1318437930875879464>',
     illuminate: '<:Illuminate:1317001808614260788>',
@@ -14,5 +14,27 @@ module.exports = {
     RareSample: '<:RareSample:1306703568425717800>',
     AutomationProgressBar: '<:AutomationProgressBar:1300333355472261144>',
     TerminidProgressBar: '<:TerminidProgressBar:1300333028572139561>',
-    IlluminateProgressBar: '<:IlluminateProgressBar:1317009125250564106>'
+    IlluminateProgressBar: '<:IlluminateProgressBar:1317009125250564106>',
+    medals: {
+        Defense_of_Calypso: {
+            emoji: '<:DefenseofCalypso:1322611766328299620>',
+            description: "Help Defend against 1st Illuminate Invasion.",
+            roleId: "1322611967176740935",
+            priority: 1
+        },
+        bravery_medal: {
+            emoji: '<:BraveryMedal:1318438001111111111>',
+            description: "Recognizes acts of bravery under fire.",
+            roleId: "234567890123456789",
+            priority: 2
+        },
+        valor_medal: {
+            emoji: '<:ValorMedal:1318438002222222222>',
+            description: "Granted for exemplary acts of valor.",
+            roleId: "345678901234567890",
+            priority: 3
+        }
+    }
 };
+
+module.exports = emojiMap;

@@ -1,15 +1,24 @@
 require('dotenv').config();
 
-const isDevMode = process.env.DEV_MODE === 'true';
-const TEST_GUILD_ID = process.env.TEST_GUILD_ID;
-const MAIN_GUILD_ID = process.env.MAIN_GUILD_ID;
+function isDevMode() {
+    return process.env.DEV_MODE === 'true';
+}
+
+const config = {
+    isDevMode: isDevMode(),
+    clientId: process.env.CLIENT_ID,
+    guildId: isDevMode() ? process.env.TEST_Guild_ID : process.env.MAIN_Guild_ID,
+    discordBotToken: process.env.DISCORD_BOT_TOKEN,
+};
+
+function getEnvironmentValue() {
+    return isDevMode() ? 'Development' : 'Production';
+}
 
 module.exports = {
     isDevMode,
-    getGuildId() {
-        return isDevMode ? TEST_GUILD_ID : MAIN_GUILD_ID;
-    },
-    logMode() {
-        console.log(`Bot is running in ${isDevMode ? 'Development' : 'Production'} Mode`);
-    },
+    clientId: config.clientId,
+    guildId: config.guildId,
+    discordBotToken: config.discordBotToken,
+    getEnvironmentValue,
 };

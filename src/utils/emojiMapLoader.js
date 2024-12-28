@@ -1,5 +1,4 @@
-const emojiMap = process.env.DEV_MODE === 'true' 
-    ? require('../data/emojiMapDev') 
-    : require('../data/emojiMap');
+const { isDevMode } = require('./envUtils');
+const emojiMap = isDevMode ? require('../data/emojiMapDev') : require('../data/emojiMap');
 
 module.exports = emojiMap;

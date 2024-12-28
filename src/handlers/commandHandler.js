@@ -17,7 +17,7 @@ async function registerCommands(client) {
     }
 
     // Debugging environment variables
-    console.log('DISCORD_CLIENT_ID:', process.env.DISCORD_CLIENT_ID);
+    console.log('CLIENT_ID:', process.env.CLIENT_ID);
 
     const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
@@ -30,7 +30,7 @@ async function registerCommands(client) {
     try {
         // Register commands to the correct guild
         await rest.put(
-            Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, targetGuildId),
+            Routes.applicationGuildCommands(process.env.CLIENT_ID, targetGuildId),
             { body: commands }
         );
         console.log(`[INFO] Successfully registered ${commands.length} commands.`);
@@ -46,12 +46,12 @@ async function unregisterCommands(client) {
 
     try {
         const registeredCommands = await rest.get(
-            Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, targetGuildId)
+            Routes.applicationGuildCommands(process.env.CLIENT_ID, targetGuildId)
         );
         console.log(`[INFO] Found ${registeredCommands.length} commands to unregister.`);
 
         for (const command of registeredCommands) {
-            await rest.delete(Routes.applicationGuildCommand(process.env.DISCORD_CLIENT_ID, targetGuildId, command.id));
+            await rest.delete(Routes.applicationGuildCommand(process.env.CLIENT_ID, targetGuildId, command.id));
             console.log(`[INFO] Deleted command: ${command.name}`);
         }
     } catch (error) {

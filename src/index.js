@@ -8,6 +8,11 @@ require('dotenv').config();
 
 console.log('Resolved Path to Command Handler:', require.resolve('./handlers/commandHandler'));
 console.log('Loaded Token:', process.env.DISCORD_BOT_TOKEN);
+console.log('DISCORD_BOT_TOKEN:', process.env.DISCORD_BOT_TOKEN);
+console.log('CLIENT_ID:', process.env.CLIENT_ID);
+console.log('TEST_Guild_ID:', process.env.TEST_Guild_ID);
+console.log('MAIN_Guild_ID:', process.env.MAIN_Guild_ID);
+console.log('DEV_MODE:', process.env.DEV_MODE);
 
 const mode = process.env.DEV_MODE === 'true' ? 'DEVELOPMENT' : 'PRODUCTION';
 

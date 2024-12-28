@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { saveQuotaGoals, saveMessageId } = require('../handlers/persistentMessageHandler');
+const { saveQuotaGoals, getMessageId, saveMessageId } = require('../handlers/persistentMessageHandler');
 const { fetchKillStats } = require('../handlers/mysqlHandler');
-const generateKillQuotaGoalsEmbed = require('../embedHandlers/killQuotaGoalsEmbed');
+const { generateKillQuotaGoalsEmbed } = require('../embedHandlers/killQuotaGoalsEmbed');
 const { logError } = require('../utils/logger');
 const { logMode } = require('../utils/logger');
 const { isDevMode } = require('../utils/envUtils');
@@ -45,30 +45,47 @@ module.exports = {
             console.log('[DEBUG] Current Kill Stats:', totals);
 
             // Generate embed
-            let embed;
-            try {
-                console.log('[DEBUG] Goals:', { terminidGoal, automatonGoal, illuminateGoal });
-                embed = generateKillQuotaGoalsEmbed(totals, { terminidGoal, automatonGoal, illuminateGoal });
-            } catch (embedError) {
-                console.error('[ERROR] Failed to generate embed:', embedError);
-                return interaction.reply({
-                    content: 'An error occurred while generating the embed. Please try again later.',
-                    ephemeral: true,
-                });
+            const embed = await generateKillQuotaGoalsEmbed(totals, { terminidGoal, automatonGoal, illuminateGoal }, interaction.channel);
+
+            // Check for existing embed
+            const channel = interaction.channel;
+            const existingMessageId = await getMessageId(KILL_QUOTA_SCOPE);
+
+            if (existingMessageId) {
+                try {
+                    // Fetch and update existing embed
+                    const message = await channel.messages.fetch(existingMessageId);
+                    await message.edit({ embeds: [embed] });
+                    console.log('[INFO] Existing Kill Quota embed updated.');
+                } catch (error) {
+                    console.warn('[WARN] Existing Kill Quota embed not found or cannot be updated. Creating a new one.');
+                    // If the message fetch fails, post a new embed
+                    const newMessage = await channel.send({ embeds: [embed] });
+                    await saveMessageId(KILL_QUOTA_SCOPE, newMessage.id);
+                    console.log('[INFO] New Kill Quota embed posted.');
+                }
+            } else {
+                // If no existing message ID, create a new embed
+                const newMessage = await channel.send({ embeds: [embed] });
+                await saveMessageId(KILL_QUOTA_SCOPE, newMessage.id);
+                console.log('[INFO] New Kill Quota embed posted.');
             }
 
-            // Send the embed and save message ID
-            const message = await interaction.reply({ embeds: [embed], fetchReply: true });
-            await saveMessageId(KILL_QUOTA_SCOPE, message.id);
-            console.log('[INFO] Kill Quota embed successfully sent.');
-
+            await interaction.reply({ content: 'Kill quotas have been set and the embed has been updated.', ephemeral: true });
         } catch (error) {
             console.error('[ERROR] Failed to set Kill Quotas:', error);
             logError(error);
-            await interaction.reply({
-                content: 'An internal error occurred while setting kill quotas. Please try again later.',
-                ephemeral: true,
-            });
+            if (!interaction.replied) {
+                await interaction.reply({
+                    content: 'An internal error occurred while setting kill quotas. Please try again later.',
+                    ephemeral: true,
+                });
+            } else {
+                await interaction.followUp({
+                    content: 'An internal error occurred. Please try again later.',
+                    ephemeral: true,
+                });
+            }
         }
     }
 };

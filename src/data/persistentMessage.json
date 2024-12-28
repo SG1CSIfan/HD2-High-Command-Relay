@@ -1,15 +1,16 @@
 {
   "killQuota": {
     "channelId": "1306785904240754738",
-    "messageId": "1318624278098346065",
-    "terminidGoal": 10000,
-    "automatonGoal": 10000,
-    "illuminateGoal": 400,
+    "messageId": "1322637365604257915",
+    "terminidGoal": 5000000,
+    "automatonGoal": 3000000,
+    "illuminateGoal": 50000,
     "interval": 60,
-    "terminidMet": true,
-    "automatonMet": true,
-    "illuminateMet": true,
-    "allGoalsMet": true
+    "terminidMet": false,
+    "automatonMet": false,
+    "illuminateMet": false,
+    "allGoalsMet": false,
+    "allGoalsMetPreviously": false
   },
   "regimentEffort": {
     "channelId": "1299487913134002258",
