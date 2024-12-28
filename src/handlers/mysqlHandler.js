@@ -87,6 +87,120 @@ async function saveOrUpdateReport(report) {
     }
 }
 
+async function saveOrUpdateBaseline(report) {
+    try {
+        const [rows] = await pool.execute(
+            'SELECT userid FROM player_baseline WHERE userid = ?',
+            [report.userId ?? null]
+        );
+
+        if (rows.length === 0) {
+            await pool.execute(
+                `INSERT INTO player_baseline 
+                (userid, enemyKills, terminidKills, automatonKills, illuminateKills, 
+                 friendlyKills, deaths, shotsFired, shotsHit, first_submission, discord_join_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    report.userId ?? null,
+                    report.enemyKills ?? 0,
+                    report.terminidKills ?? 0,
+                    report.automatonKills ?? 0,
+                    report.illuminateKills ?? 0,
+                    report.friendlyKills ?? 0,
+                    report.deaths ?? 0,
+                    report.shotsFired ?? 0,
+                    report.shotsHit ?? 0,
+                    report.firstSubmission ?? new Date(),
+                    report.discordJoinDate ?? new Date(),
+                ]
+            );
+            console.log('[DEBUG] New player_baseline record created.');
+        } else {
+            console.log('[DEBUG] Player_baseline record exists. Skipping update.');
+        }
+    } catch (error) {
+        console.error('[ERROR] Failed to save/update Player_baseline:', error);
+        throw error;
+    }
+}
+
+async function savePlayerContribution(report) {
+    try {
+        // Fetch the baseline stats for the user
+        const [baselineRows] = await pool.execute(
+            'SELECT * FROM player_baseline WHERE userid = ?',
+            [report.userId]
+        );
+
+        if (baselineRows.length === 0) {
+            console.warn('[WARN] No player_baseline found for user:', report.userId);
+            return;
+        }
+
+        const baseline = baselineRows[0];
+
+        // Calculate differences
+        const contribution = {
+            userId: report.userId,
+            enemyKills: report.enemyKills - baseline.enemyKills,
+            terminidKills: report.terminidKills - baseline.terminidKills,
+            automatonKills: report.automatonKills - baseline.automatonKills,
+            illuminateKills: report.illuminateKills - baseline.illuminateKills,
+            friendlyKills: report.friendlyKills - baseline.friendlyKills,
+            deaths: report.deaths - baseline.deaths,
+            shotsFired: report.shotsFired - baseline.shotsFired,
+            shotsHit: report.shotsHit - baseline.shotsHit,
+        };
+
+        // Insert or update the player's contributions
+        const [rows] = await pool.execute(
+            'SELECT userid FROM player_contributions WHERE userid = ?',
+            [report.userId]
+        );
+
+        if (rows.length === 0) {
+            await pool.execute(
+                `INSERT INTO player_contributions 
+                (userid, enemyKills, terminidKills, automatonKills, illuminateKills, friendlyKills, deaths, shotsFired, shotsHit) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    contribution.userId,
+                    contribution.enemyKills,
+                    contribution.terminidKills,
+                    contribution.automatonKills,
+                    contribution.illuminateKills,
+                    contribution.friendlyKills,
+                    contribution.deaths,
+                    contribution.shotsFired,
+                    contribution.shotsHit,
+                ]
+            );
+            console.log('[DEBUG] New player contribution record created.');
+        } else {
+            await pool.execute(
+                `UPDATE player_contributions 
+                SET enemyKills = ?, terminidKills = ?, automatonKills = ?, illuminateKills = ?, friendlyKills = ?, deaths = ?, shotsFired = ?, shotsHit = ? 
+                WHERE userid = ?`,
+                [
+                    contribution.enemyKills,
+                    contribution.terminidKills,
+                    contribution.automatonKills,
+                    contribution.illuminateKills,
+                    contribution.friendlyKills,
+                    contribution.deaths,
+                    contribution.shotsFired,
+                    contribution.shotsHit,
+                    contribution.userId,
+                ]
+            );
+            console.log('[DEBUG] Player contribution record updated.');
+        }
+    } catch (error) {
+        console.error('[ERROR] Failed to save/update player contributions:', error);
+        throw error;
+    }
+}
+
 async function fetchKillStats() {
     const [rows] = await pool.query(`
         SELECT 
@@ -114,4 +228,10 @@ async function fetchWarEffortTotals() {
     return rows[0] || {};
 }
 
-module.exports = { saveOrUpdateReport, fetchKillStats, fetchWarEffortTotals };
+module.exports = { 
+    saveOrUpdateReport, 
+    fetchKillStats, 
+    fetchWarEffortTotals,
+    saveOrUpdateBaseline,
+    savePlayerContribution
+ };
