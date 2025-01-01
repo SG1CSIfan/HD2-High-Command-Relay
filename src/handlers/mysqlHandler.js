@@ -201,65 +201,131 @@ async function savePlayerContribution(report) {
     }
 }
 
-async function fetchUserStats(userId) {
+async function fetchCareerStats(userId) {
+    if (!userId) {
+        console.warn('[WARN] No userId provided for fetchCareerStats.');
+        return null;
+    }
+
     try {
         const [rows] = await pool.execute(
             `SELECT 
-                pc.enemyKills,
-                pc.terminidKills,
-                pc.automatonKills,
-                pc.illuminateKills,
-                pc.friendlyKills,
-                pc.deaths,
-                pc.shotsFired,
-                pc.shotsHit,
-                pb.first_submission,
-                pb.discord_join_date,
-                pc.last_updated AS lastUpdated
-            FROM player_contributions pc
-                JOIN player_baseline pb ON pc.userId = pb.userId
-            WHERE pc.userId = ?
-    `,
-    [userId]
-);
+                enemyKills,
+                terminidKills,
+                automatonKills,
+                illuminateKills,
+                friendlyKills,
+                deaths,
+                shotsFired,
+                shotsHit,
+                timestamp AS lastUpdated
+             FROM service_reports
+             WHERE userId = ?`,
+            [userId]
+        );
 
         if (rows.length === 0) {
-            console.log('[DEBUG] No record found for user:', userId);
-            return null; // No record found
+            console.log('[DEBUG] No career stats found for user:', userId);
+            return {
+                enemyKills: 0,
+                terminidKills: 0,
+                automatonKills: 0,
+                illuminateKills: 0,
+                friendlyKills: 0,
+                deaths: 0,
+                shotsFired: 0,
+                shotsHit: 0,
+                lastUpdated: null,
+            };
         }
 
-        return rows[0]; // Return the first (and only) record
+        return rows[0];
     } catch (error) {
-        console.error('[ERROR] Failed to fetch user stats:', error);
+        console.error('[ERROR] Failed to fetch career stats for user:', userId, error);
+        throw error;
+    }
+}
+
+async function fetchRegimentStats(userId) {
+    if (!userId) {
+        console.warn('[WARN] No userId provided for fetchRegimentStats.');
+        return null;
+    }
+
+    try {
+        const [rows] = await pool.execute(
+            `SELECT 
+                enemyKills,
+                terminidKills,
+                automatonKills,
+                illuminateKills,
+                friendlyKills,
+                deaths,
+                shotsFired,
+                shotsHit,
+                last_updated AS lastUpdated
+             FROM player_contributions
+             WHERE userId = ?`,
+            [userId]
+        );
+
+        if (rows.length === 0) {
+            console.log('[DEBUG] No regiment stats found for user:', userId);
+            return {
+                enemyKills: 0,
+                terminidKills: 0,
+                automatonKills: 0,
+                illuminateKills: 0,
+                friendlyKills: 0,
+                deaths: 0,
+                shotsFired: 0,
+                shotsHit: 0,
+                lastUpdated: null,
+            };
+        }
+
+        return rows[0];
+    } catch (error) {
+        console.error('[ERROR] Failed to fetch regiment stats for user:', userId, error);
         throw error;
     }
 }
 
 async function fetchKillStats() {
-    const [rows] = await pool.query(`
-        SELECT 
-            SUM(terminidKills) AS terminidKills,
-            SUM(automatonKills) AS automatonKills,
-            SUM(illuminateKills) AS illuminateKills
-        FROM service_reports
-    `);
-    return rows[0] || { terminidKills: 0, automatonKills: 0, illuminateKills: 0 };
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                SUM(terminidKills) AS terminidKills,
+                SUM(automatonKills) AS automatonKills,
+                SUM(illuminateKills) AS illuminateKills
+            FROM service_reports
+        `);
+        return rows[0] || { terminidKills: 0, automatonKills: 0, illuminateKills: 0 };
+    } catch (error) {
+        console.error('[ERROR] Failed to fetch kill stats:', error);
+        return { terminidKills: 0, automatonKills: 0, illuminateKills: 0 };
+    }
 }
 
 async function fetchWarEffortTotals() {
-    const [rows] = await pool.query(`
-        SELECT 
-            SUM(terminidKills) AS terminidKills,
-            SUM(automatonKills) AS automatonKills,
-            SUM(illuminateKills) AS illuminateKills,
-            SUM(friendlyKills) AS friendlyKills,
-            SUM(deaths) AS deaths,
-            SUM(shotsFired) AS shotsFired,
-            SUM(shotsHit) AS shotsHit,
-            COUNT(*) AS totalSubmissions
-        FROM service_reports
-    `);
-    return rows[0] || {};
+    try {
+        const [rows] = await pool.query(`
+            SELECT 
+                SUM(terminidKills) AS terminidKills,
+                SUM(automatonKills) AS automatonKills,
+                SUM(illuminateKills) AS illuminateKills,
+                SUM(friendlyKills) AS friendlyKills,
+                SUM(deaths) AS deaths,
+                SUM(shotsFired) AS shotsFired,
+                SUM(shotsHit) AS shotsHit,
+                COUNT(*) AS totalSubmissions
+            FROM service_reports
+        `);
+        return rows[0] || {};
+    } catch (error) {
+        console.error('[ERROR] Failed to fetch war effort totals:', error);
+        return {};
+    }
 }
 
 module.exports = { 
@@ -268,5 +334,6 @@ module.exports = {
     fetchWarEffortTotals,
     saveOrUpdateBaseline,
     savePlayerContribution,
-    fetchUserStats
+    fetchRegimentStats,
+    fetchCareerStats
  };
