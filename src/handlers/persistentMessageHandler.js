@@ -74,7 +74,7 @@ async function saveMessageId(scope, messageId) {
     if (!data[scope]) data[scope] = {};
     data[scope].messageId = messageId;
     await writePersistentData(data);
-    console.log(`[INFO] Saved message ID for ${scope}.`);
+    // console.log(`[INFO] Saved message ID for ${scope}.`);
 }
 
 async function getQuotaGoals() {

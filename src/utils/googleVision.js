@@ -32,14 +32,14 @@ async function analyzeImage(imageUrl) {
         }
 
         // Log raw OCR text for debugging
-        console.log('[DEBUG] Raw OCR Text:', annotations[0]?.description || 'No text found');
+        // console.log('[DEBUG] Raw OCR Text:', annotations[0]?.description || 'No text found');
 
         // Sort text regions left-to-right, top-to-bottom
         const sortedData = sortTextData(annotations.slice(1));
         const joinedDescriptions = sortedData.map(item => item.description).join(' ');
 
         // Log the sorted and joined text for debugging
-        console.log('[DEBUG] Sorted and Joined Text:', joinedDescriptions);
+        // console.log('[DEBUG] Sorted and Joined Text:', joinedDescriptions);
 
         // Extract stats using updated regex patterns
         const stats = {
@@ -54,7 +54,7 @@ async function analyzeImage(imageUrl) {
         };
 
         // Log extracted stats for debugging
-        console.log('[DEBUG] Extracted Stats:', stats);
+        // console.log('[DEBUG] Extracted Stats:', stats);
 
         return stats;
     } catch (error) {

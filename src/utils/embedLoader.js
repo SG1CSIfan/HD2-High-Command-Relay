@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const PERSISTENT_FILE = path.resolve(__dirname, '../data/persistentMessage.json');
 
-console.log('[DEBUG] Resolved path:', PERSISTENT_FILE);
+//console.log('[DEBUG] Resolved path:', PERSISTENT_FILE);
 
 function ensurePersistentFile() {
     const dir = path.dirname(PERSISTENT_FILE);
