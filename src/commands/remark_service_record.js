@@ -5,9 +5,9 @@ const { hasPermissionForCommand } = require('../handlers/permissionHandler');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('remark_service_record')
-        .setDescription('Add a positive or negative remark to a player.')
+        .setDescription('Fleet Caste Only: Add a positive or negative remark to a player.')
         .addUserOption(option =>
-            option.setName('target')
+            option.setName('member')
                 .setDescription('The player to leave a remark for.')
                 .setRequired(true)
         )
@@ -26,7 +26,7 @@ module.exports = {
                 .setRequired(true)
         ),
     async execute(interaction) {
-        const targetUser = interaction.options.getUser('target');
+        const targetUser = interaction.options.getUser('member');
         const remarkType = interaction.options.getString('remark_type');
         const remarkDetails = interaction.options.getString('details');
         const member = interaction.member;

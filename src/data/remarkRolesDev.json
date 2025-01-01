@@ -2,24 +2,38 @@
     "commands": {
         "remark_service_record": {
             "allowedRoles": [
-                { "id": "1315330512818274355", 
-                  "name": "Freedom Caste", 
-                  "hierarchical": true 
+                {
+                    "id": "1315330512818274355",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
                 }
             ]
         },
         "full_service_record": {
             "allowedRoles": [
-                { "id": "1315330512818274355", 
-                  "name": "Freedom Caste", 
-                  "hierarchical": true 
+                {
+                    "id": "1315330512818274355",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
                 }
             ]
-        }
-        ,
-        "another_command": {
+        },
+        "leave_server": {
             "allowedRoles": [
-                { "id": "456789012345678901", "name": "SpecialRole", "hierarchical": false }
+                {
+                    "id": "1315330512818274355",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
+                }
+            ]
+        },
+        "list_servers": {
+            "allowedRoles": [
+                {
+                    "id": "1315330512818274355",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
+                }
             ]
         }
     }

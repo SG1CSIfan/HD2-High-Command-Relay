@@ -19,27 +19,24 @@ function hasPermissionForCommand(member, commandName) {
 
     const { allowedRoles } = commandConfig;
 
-    for (const role of allowedRoles) {
-        if (role.hierarchical) {
-            // Check for the role and above
-            const roleIds = allowedRoles.map(r => r.id);
-            const index = roleIds.indexOf(role.id);
+    return allowedRoles.some(roleConfig => {
+        const guildRole = member.guild.roles.cache.get(roleConfig.id);
+        const memberRole = member.roles.cache.get(roleConfig.id);
 
-            if (index !== -1) {
-                const hierarchySubset = roleIds.slice(index);
-                if (member.roles.cache.some(r => hierarchySubset.includes(r.id))) {
-                    return true;
-                }
-            }
-        } else {
-            // Check for specific role only
-            if (member.roles.cache.has(role.id)) {
-                return true;
-            }
+        if (!guildRole) {
+            console.warn(`[WARN] Role ID ${roleConfig.id} not found in guild.`);
+            return false;
         }
-    }
 
-    return false;
+        // Hierarchical check
+        if (roleConfig.hierarchical) {
+            // Check if the member has a role equal to or higher in position
+            return member.roles.highest.position >= guildRole.position;
+        }
+
+        // Specific role check
+        return !!memberRole;
+    });
 }
 
 module.exports = { hasPermissionForCommand };

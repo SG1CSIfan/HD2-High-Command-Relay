@@ -7,16 +7,16 @@ const { hasPermissionForCommand } = require('../handlers/permissionHandler');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('full_service_record')
-        .setDescription('View the full service record including stats and remarks.')
+        .setDescription('Freedom Caste Only: View the full service record including stats and remarks.')
         .addUserOption(option =>
-            option.setName('target')
+            option.setName('member')
                 .setDescription('User to view the record for.')
                 .setRequired(false)
         ),
     async execute(interaction) {
         await interaction.deferReply();
 
-        const targetUser = interaction.options.getUser('target') || interaction.user;
+        const targetUser = interaction.options.getUser('member') || interaction.user;
 
         // Permission Check
         if (!hasPermissionForCommand(interaction.member, 'full_service_record')) {

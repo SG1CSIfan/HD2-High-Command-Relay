@@ -6,14 +6,14 @@ module.exports = {
         .setName('service_record')
         .setDescription('View your service record or another user\'s record.')
         .addUserOption(option =>
-            option.setName('target')
+            option.setName('member')
                 .setDescription('User to view the record for.')
                 .setRequired(false)
         ),
     async execute(interaction) {
         await interaction.deferReply();
 
-        const targetUser = interaction.options.getUser('target') || interaction.user;
+        const targetUser = interaction.options.getUser('member') || interaction.user;
 
         try {
             const embed = await handleServiceRecord(targetUser, interaction.guild);

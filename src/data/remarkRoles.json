@@ -15,11 +15,29 @@
                   "hierarchical": true 
                 }
             ]
-        }
-        ,
+        },
+        "leave-serverS": {
+            "allowedRoles": [
+                { "id": "1242673359851094097", 
+                  "name": "Freedom Caste", 
+                  "hierarchical": true 
+                }
+            ]
+        },
+        "list-servers": {
+            "allowedRoles": [
+                { "id": "1242673359851094097", 
+                  "name": "Freedom Caste", 
+                  "hierarchical": true 
+                }
+            ]
+        },
         "another_command": {
             "allowedRoles": [
-                { "id": "456789012345678901", "name": "SpecialRole", "hierarchical": false }
+                { "id": "1242673359851094097", 
+                  "name": "Freedom Caste", 
+                  "hierarchical": true 
+                }
             ]
         }
     }

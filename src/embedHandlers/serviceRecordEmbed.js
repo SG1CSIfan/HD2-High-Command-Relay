@@ -17,7 +17,7 @@ function generateServiceRecordEmbed(user, statsCareer, statsRegiment, nickname, 
     const embed = new EmbedBuilder()
         .setColor(0x1e90ff)
         .setTitle('1st Colonial Regiment Service Record')
-        .setDescription(`Service record for [ ${nickname} ]`)
+        .setDescription(`Service record for  ${nickname} `)
         .addFields(
             { name: 'Joined 1st Colonial Regiment', value: `<t:${Math.floor(guild.members.cache.get(user.id)?.joinedAt?.getTime() / 1000)}:D>`, inline: false },
             { name: 'Service Time', value: calculateServiceTime(guild.members.cache.get(user.id)?.joinedAt), inline: false },
