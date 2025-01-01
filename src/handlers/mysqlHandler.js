@@ -89,17 +89,20 @@ async function saveOrUpdateReport(report) {
 
 async function saveOrUpdateBaseline(report) {
     try {
+        // Check if the userId exists in player_baseline
         const [rows] = await pool.execute(
-            'SELECT userid FROM player_baseline WHERE userid = ?',
+            'SELECT discord_join_date FROM player_baseline WHERE userid = ?',
             [report.userId ?? null]
         );
 
         if (rows.length === 0) {
+            // If no userId exists, insert a new record
             await pool.execute(
                 `INSERT INTO player_baseline 
                 (userid, enemyKills, terminidKills, automatonKills, illuminateKills, 
                  friendlyKills, deaths, shotsFired, shotsHit, first_submission, discord_join_date)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+
                 [
                     report.userId ?? null,
                     report.enemyKills ?? 0,
@@ -111,12 +114,29 @@ async function saveOrUpdateBaseline(report) {
                     report.shotsFired ?? 0,
                     report.shotsHit ?? 0,
                     report.firstSubmission ?? new Date(),
-                    report.discordJoinDate ?? new Date(),
+                    report.discordJoinDate ?? new Date(), // Add current date if not provided
                 ]
             );
             console.log('[DEBUG] New player_baseline record created.');
         } else {
-            console.log('[DEBUG] Player_baseline record exists. Skipping update.');
+            // If userId exists, check if discord_join_date is missing
+            const discordJoinDate = rows[0].discord_join_date;
+
+            if (!discordJoinDate) {
+                // Update the record with the missing discord_join_date
+                await pool.execute(
+                    `UPDATE player_baseline 
+                     SET discord_join_date = ? 
+                     WHERE userid = ?`,
+                    [
+                        report.discordJoinDate ?? new Date(), // Add the provided or current date
+                        report.userId ?? null,
+                    ]
+                );
+                console.log('[DEBUG] Updated discord_join_date for existing player_baseline record.');
+            } else {
+                console.log('[DEBUG] Player_baseline record exists and discord_join_date is already set. Skipping update.');
+            }
         }
     } catch (error) {
         console.error('[ERROR] Failed to save/update Player_baseline:', error);
