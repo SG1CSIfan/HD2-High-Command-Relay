@@ -2,6 +2,7 @@ const emojiMap = {
     terminid: '<:Terminid:1318437943135965184>',
     automaton: '<:Automaton:1318437930875879464>',
     illuminate: '<:Illuminate:1317001808614260788>',
+    EnemyKills: '<:Helldiver:1318437955290923048>',
     friendlyKills: '<:DeadHD2:1318437979387068427>',
     deaths: '<:DeadHD2:1318437979387068427>',
     shotsFired: '<:HD2Gun:1318437967064469544>',

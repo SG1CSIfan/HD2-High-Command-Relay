@@ -2,7 +2,7 @@
     "commands": {
         "remark_service_record": {
             "allowedRoles": [
-                { "id": "1315330512818274355", 
+                { "id": "1242673359851094097", 
                   "name": "Freedom Caste", 
                   "hierarchical": true 
                 }
@@ -10,7 +10,7 @@
         },
         "full_service_record": {
             "allowedRoles": [
-                { "id": "1315330512818274355", 
+                { "id": "1242673359851094097", 
                   "name": "Freedom Caste", 
                   "hierarchical": true 
                 }

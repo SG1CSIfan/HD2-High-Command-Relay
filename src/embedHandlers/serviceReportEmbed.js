@@ -28,7 +28,7 @@ function generateServiceReportEmbed(data, imageUrl, nickname) {
         )
         .addFields(
             { name: '🆔 Record ID', value: `${data.rowId}`, inline: false },
-            { name: '⚔️ Enemy Kills', value: `${data.enemyKills || 0}`, inline: false },
+            { name: `${emojiMap.EnemyKills} Enemy Kills`, value: `${data.enemyKills || 0}`, inline: false },
             { name: `${emojiMap.terminid} Terminid Kills`, value: `${data.terminidKills || 0}`, inline: true },
             { name: `${emojiMap.automaton} Automaton Kills`, value: `${data.automatonKills || 0}`, inline: true },
             { name: `${emojiMap.illuminate} Illuminate Kills`, value: `${data.illuminateKills || 0}`, inline: true },
