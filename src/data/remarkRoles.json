@@ -2,41 +2,46 @@
     "commands": {
         "remark_service_record": {
             "allowedRoles": [
-                { "id": "1242673359851094097", 
-                  "name": "Freedom Caste", 
-                  "hierarchical": true 
+                {
+                    "id": "1242673359851094097",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
                 }
             ]
         },
         "full_service_record": {
             "allowedRoles": [
-                { "id": "1242673359851094097", 
-                  "name": "Freedom Caste", 
-                  "hierarchical": true 
+                {
+                    "id": "1242673359851094097",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
                 }
             ]
         },
-        "leave-serverS": {
+        "leave_server": {
             "allowedRoles": [
-                { "id": "1242673359851094097", 
-                  "name": "Freedom Caste", 
-                  "hierarchical": true 
+                {
+                    "id": "1242673359851094097",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
                 }
             ]
         },
-        "list-servers": {
+        "list_servers": {
             "allowedRoles": [
-                { "id": "1242673359851094097", 
-                  "name": "Freedom Caste", 
-                  "hierarchical": true 
+                {
+                    "id": "1242673359851094097",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
                 }
             ]
         },
-        "another_command": {
+        "kill_quota_goals": {
             "allowedRoles": [
-                { "id": "1242673359851094097", 
-                  "name": "Freedom Caste", 
-                  "hierarchical": true 
+                {
+                    "id": "1242673359851094097",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
                 }
             ]
         }

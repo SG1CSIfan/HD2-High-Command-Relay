@@ -35,6 +35,15 @@
                     "hierarchical": true
                 }
             ]
+        },
+        "kill_quota_goals": {
+            "allowedRoles": [
+                {
+                    "id": "1315330512818274355",
+                    "name": "Freedom Caste",
+                    "hierarchical": true
+                }
+            ]
         }
     }
 }

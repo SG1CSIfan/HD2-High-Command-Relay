@@ -5,6 +5,7 @@ const { generateKillQuotaGoalsEmbed } = require('../embedHandlers/killQuotaGoals
 const { logError } = require('../utils/logger');
 const { logMode } = require('../utils/logger');
 const { isDevMode } = require('../utils/envUtils');
+const { hasPermissionForCommand } = require('../handlers/permissionHandler');
 
 logMode(isDevMode ? 'Development' : 'Production');
 
@@ -12,8 +13,8 @@ const KILL_QUOTA_SCOPE = 'killQuota';
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('killquotagoals')
-        .setDescription('Set kill quotas and track progress.')
+        .setName('kill_quota_goals')
+        .setDescription('Freedom Caste Only: Set kill quotas and track progress.')
         .addIntegerOption(option =>
             option.setName('terminidgoal').setDescription('Set Terminid goal').setRequired(true))
         .addIntegerOption(option =>
@@ -23,6 +24,15 @@ module.exports = {
 
     async execute(interaction) {
         try {
+            // Check if the user has permission for this command
+            const hasPermission = hasPermissionForCommand(interaction.member, 'killquotagoals');
+            if (!hasPermission) {
+                return interaction.reply({
+                    content: 'You do not have the required permissions to set kill quotas.',
+                    ephemeral: true,
+                });
+            }
+
             // Retrieve input values
             const terminidGoal = interaction.options.getInteger('terminidgoal');
             const automatonGoal = interaction.options.getInteger('automatongoal');
