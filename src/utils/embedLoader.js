@@ -51,9 +51,17 @@ async function loadOrUpdateEmbeds(client, scope) {
             return;
         }
 
-        const channel = await client.channels.fetch(data[scope].channelId);
-        let embed;
+        const channel = await client.channels.fetch(data[scope].channelId).catch((error) => {
+            console.error(`[ERROR] Failed to fetch channel for ${scope}:`, error);
+            return null;
+        });
 
+        if (!channel) {
+            console.warn(`[WARN] ${scope} channel could not be fetched. Skipping update.`);
+            return;
+        }
+
+        let embed;
         if (scope === 'killQuota') {
             const totals = await fetchKillStats();
             const goals = await getQuotaGoals();
@@ -65,15 +73,32 @@ async function loadOrUpdateEmbeds(client, scope) {
 
         const messageId = data[scope]?.messageId;
         if (messageId) {
-            const message = await channel.messages.fetch(messageId);
-            await message.edit({ embeds: [embed] });
+            try {
+                const message = await channel.messages.fetch(messageId);
+                await message.edit({ embeds: [embed] });
+                console.log(`[INFO] ${scope} embed updated successfully.`);
+            } catch (error) {
+                if (error.code === 50001) {
+                    console.error(`[ERROR] Missing Access to edit message in channel: ${channel.id}`);
+                } else if (error.code === 10008) {
+                    console.warn(`[WARN] Message not found: ${messageId}. Creating a new embed.`);
+                    const message = await channel.send({ embeds: [embed] });
+                    data[scope].messageId = message.id;
+                    await fsPromises.writeFile(PERSISTENT_FILE, JSON.stringify(data, null, 2));
+                } else {
+                    console.error(`[ERROR] Failed to edit message for ${scope}:`, error);
+                }
+            }
         } else {
-            const message = await channel.send({ embeds: [embed] });
-            data[scope].messageId = message.id;
-            await fsPromises.writeFile(PERSISTENT_FILE, JSON.stringify(data, null, 2));
+            try {
+                const message = await channel.send({ embeds: [embed] });
+                data[scope].messageId = message.id;
+                await fsPromises.writeFile(PERSISTENT_FILE, JSON.stringify(data, null, 2));
+                console.log(`[INFO] New ${scope} embed created and message ID saved.`);
+            } catch (error) {
+                console.error(`[ERROR] Failed to send new embed for ${scope}:`, error);
+            }
         }
-
-        console.log(`[INFO] ${scope} embed updated.`);
     } catch (error) {
         console.error(`[ERROR] Failed to update ${scope} embed:`, error);
     }

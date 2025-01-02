@@ -10,6 +10,9 @@ const remarkRoles = isDevMode()
  * @returns {boolean}
  */
 function hasPermissionForCommand(member, commandName) {
+    console.log(`[DEBUG] Checking permissions for ${commandName}`);
+    console.log(`[DEBUG] Member roles: ${member.roles.cache.map(r => r.name).join(', ')}`);
+
     const commandConfig = remarkRoles.commands[commandName];
 
     if (!commandConfig) {
@@ -30,11 +33,14 @@ function hasPermissionForCommand(member, commandName) {
 
         // Hierarchical check
         if (roleConfig.hierarchical) {
+            console.log(`[DEBUG] Checking hierarchical role permissions`);
+            
             // Check if the member has a role equal to or higher in position
             return member.roles.highest.position >= guildRole.position;
         }
 
         // Specific role check
+        console.log(`[DEBUG] Checking specific role permissions`);
         return !!memberRole;
     });
 }
