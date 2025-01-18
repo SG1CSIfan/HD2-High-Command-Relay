@@ -38,6 +38,7 @@ function splitContentIntoFields(content, maxLength = 1024) {
 
 function createLeaderboardEmbed(category, hd2Leaderboard, regimentLeaderboard, ranks) {
     const maxUsernameLength = 20; // Limit usernames to 20 characters
+    const maxFieldLength = 1024; // Discord embed field limit
 
     const truncateUsername = (username) => {
         return username.length > maxUsernameLength
@@ -53,20 +54,37 @@ function createLeaderboardEmbed(category, hd2Leaderboard, regimentLeaderboard, r
 
     const formatKills = (leaderboard) => leaderboard.map((entry) => `${entry.kills.toLocaleString()}`);
 
+    const splitFields = (title, values) => {
+        const fields = [];
+        let currentChunk = [];
+
+        values.forEach((line) => {
+            if (currentChunk.join('\n').length + line.length + 1 > maxFieldLength) {
+                fields.push({ name: title, value: `\`\`\`\n${currentChunk.join('\n')}\`\`\``, inline: true });
+                currentChunk = [];
+            }
+            currentChunk.push(line);
+        });
+
+        if (currentChunk.length) {
+            fields.push({ name: title, value: `\`\`\`\n${currentChunk.join('\n')}\`\`\``, inline: true });
+        }
+
+        return fields;
+    };
+
+    const hd2UserFields = splitFields('Helldivers (Career Page)', formatUsernames(hd2Leaderboard));
+    const hd2KillFields = splitFields('Kills (Career Page)', formatKills(hd2Leaderboard));
+
+    const regimentUserFields = splitFields('Helldivers (1st Regiment)', formatUsernames(regimentLeaderboard));
+    const regimentKillFields = splitFields('Kills (1st Regiment)', formatKills(regimentLeaderboard));
+
     const embed = new EmbedBuilder()
         .setTitle(`🏆 Leader Board - ${category.replace(/([A-Z])/g, ' $1')}`)
         .setDescription(`Leader Board of the 1st Colonial Regiment\nInformation for ${category}`)
-        .addFields(
-            // Career Page group
-            { name: 'Helldivers (Career Page)', value: `\`\`\`\n${formatUsernames(hd2Leaderboard).join('\n')}\`\`\``, inline: true },
-            { name: 'Kills (Career Page)', value: `\`\`\`\n${formatKills(hd2Leaderboard).join('\n')}\`\`\``, inline: true },
-            { name: '\u200B', value: '\u200B', inline: false }, // Blank spacer
-
-            // 1st Regiment group
-            { name: 'Helldivers (1st Regiment)', value: `\`\`\`\n${formatUsernames(regimentLeaderboard).join('\n')}\`\`\``, inline: true },
-            { name: 'Kills (1st Regiment)', value: `\`\`\`\n${formatKills(regimentLeaderboard).join('\n')}\`\`\``, inline: true },
-            { name: '\u200B', value: '\u200B', inline: false } // Blank spacer
-        )
+        .addFields([...hd2UserFields, ...hd2KillFields])
+        .addFields({ name: '\u200B', value: '\u200B', inline: false }) // Blank spacer
+        .addFields([...regimentUserFields, ...regimentKillFields])
         .addFields({
             name: 'Your Rank',
             value: `You are #${ranks.userCareerRank} in Career Page and #${ranks.userRegimentRank} in 1st Regiment.`,
@@ -78,6 +96,5 @@ function createLeaderboardEmbed(category, hd2Leaderboard, regimentLeaderboard, r
 
     return embed;
 }
-
 
 module.exports = { createLeaderboardEmbed };
