@@ -6,17 +6,16 @@ const { readPersistentData } = require('./handlers/persistentMessageHandler');
 const path = require('path');
 require('dotenv').config();
 
-// console.log('Resolved Path to Command Handler:', require.resolve('./handlers/commandHandler'));
-// console.log('Loaded Token:', process.env.DISCORD_BOT_TOKEN);
-// console.log('CLIENT_ID:', process.env.CLIENT_ID);
-// console.log('TEST_Guild_ID:', process.env.TEST_Guild_ID);
-// console.log('MAIN_Guild_ID:', process.env.MAIN_Guild_ID);
 console.log('DEV_MODE:', process.env.DEV_MODE);
 
 const mode = process.env.DEV_MODE === 'true' ? 'DEVELOPMENT' : 'PRODUCTION';
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMembers, // Add intent to fetch guild members
+    ],
 });
 
 client.commands = new Map();
@@ -27,6 +26,18 @@ client.once('ready', async () => {
 
     // Register commands dynamically
     await registerCommands(client);
+
+    // Preload members for all guilds
+    try {
+        console.log('[INFO] Preloading guild members...');
+        for (const [guildId, guild] of client.guilds.cache) {
+            await guild.members.fetch();
+            console.log(`[INFO] Preloaded members for guild: ${guild.name} (${guildId})`);
+        }
+        console.log('[INFO] All guild members preloaded successfully.');
+    } catch (error) {
+        console.error('[ERROR] Failed to preload guild members:', error);
+    }
 
     // Load update intervals dynamically from persistentMessage.json
     let data;
@@ -49,7 +60,6 @@ client.once('ready', async () => {
             const interval = data[scope].interval * 1000; // Convert seconds to milliseconds
 
             intervals[scope] = setInterval(() => {
-                //console.log(`[INFO] Updating ${scope} embed...`);
                 loadOrUpdateEmbeds(client, scope);
             }, interval);
 

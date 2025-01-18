@@ -348,7 +348,8 @@ async function fetchWarEffortTotals() {
     }
 }
 
-module.exports = { 
+module.exports = {
+    pool, 
     saveOrUpdateReport, 
     fetchKillStats, 
     fetchWarEffortTotals,

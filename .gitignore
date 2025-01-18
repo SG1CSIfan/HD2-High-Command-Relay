@@ -3,3 +3,4 @@ node_modules/
 logs/
 utils/vison-key.json
 src/data/persistentMessage.json
+src/utils/vision-key.json
