@@ -9,7 +9,7 @@ module.exports = {
             option
                 .setName('category')
                 .setDescription('Choose a leaderboard category.')
-                .setRequired(true) // Make it mandatory
+                .setRequired(true) // Mandatory field
                 .addChoices(
                     { name: 'Total Kills', value: 'enemyKills' },
                     { name: 'Terminid Kills', value: 'terminidKills' },
@@ -21,24 +21,30 @@ module.exports = {
             option
                 .setName('broadcast')
                 .setDescription('Make the leaderboard visible to everyone or only to you (optional).')
-                .setRequired(false) // Optional
+                .setRequired(false) // Optional field
         ),
     async execute(interaction) {
         const category = interaction.options.getString('category');
-        const broadcast = interaction.options.getBoolean('broadcast') ?? false; // Default to false if blank
+        const broadcast = interaction.options.getBoolean('broadcast') ?? false; // Default to false if not provided
 
         try {
-            await interaction.deferReply({ ephemeral: !broadcast }); // Ephemeral if broadcast is false
-            const embed = await getLeaderboardData(interaction.guild, category);
+            // Use deferReply with the ephemeral option based on broadcast
+            await interaction.deferReply({ ephemeral: !broadcast });
 
+            // Get leaderboard embed
+            const embed = await getLeaderboardData(interaction.guild, category, interaction.user.id);
+
+            // Send the leaderboard response
             await interaction.editReply({
                 embeds: [embed],
-                ephemeral: !broadcast, // Show only to the user if broadcast is false
+                ephemeral: !broadcast, // Ephemeral response based on broadcast
             });
         } catch (error) {
             console.error('[ERROR] Failed to execute leaderboard command:', error);
+
+            // Error response
             await interaction.editReply({
-                content: 'An error occurred while generating the leaderboard.',
+                content: 'An error occurred while generating the leaderboard. Please try again later.',
                 ephemeral: true,
             });
         }

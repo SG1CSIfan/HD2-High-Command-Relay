@@ -1,9 +1,46 @@
 const { pool } = require('./mysqlHandler');
 const { createLeaderboardEmbed } = require('../embedHandlers/leaderboardEmbed');
-const { filterLeaderboardMembers } = require('./leaderboardFilterHandler'); // Import the function
+const { filterLeaderboardMembers } = require('./leaderboardFilterHandler');
 const leaderboardCache = new Map();
 
-async function getLeaderboardData(guild, category) {
+// Function to get user rank
+async function getUserRank(userId, category, tableName) {
+    const query = `
+        SELECT COUNT(*) + 1 AS \`rank\`
+        FROM ${tableName}
+        WHERE ${category} > (
+            SELECT ${category}
+            FROM ${tableName}
+            WHERE userId = ?
+        )
+    `;
+    const [rows] = await pool.query(query, [userId]);
+    return rows[0]?.rank || 'N/A';
+}
+
+// Function to resolve nicknames
+async function resolveNicknames(rows, guild) {
+    return await Promise.all(
+        rows.map(async (row) => {
+            try {
+                let member = guild.members.cache.get(row.userId);
+                if (!member) {
+                    member = await guild.members.fetch(row.userId).catch(() => null);
+                }
+                return {
+                    nickname: member?.nickname || member?.user?.username || `Unknown (${row.userId})`,
+                    kills: row.kills,
+                };
+            } catch (error) {
+                console.error(`[ERROR] Failed to fetch member for userId: ${row.userId}`, error);
+                return { nickname: `Unknown (${row.userId})`, kills: row.kills };
+            }
+        })
+    );
+}
+
+// Function to get leaderboard data
+async function getLeaderboardData(guild, category, userId) {
     if (!guild || !guild.members) {
         throw new Error('Invalid guild object provided to getLeaderboardData.');
     }
@@ -36,13 +73,20 @@ async function getLeaderboardData(guild, category) {
 
         console.log(`[DEBUG] Database fetch complete in ${Date.now() - start}ms.`);
 
-        // Filter members for both leaderboards
-        const hd2Leaderboard = await filterLeaderboardMembers(hd2Rows, guild);
-        const regimentLeaderboard = await filterLeaderboardMembers(regimentRows, guild);
+        // Resolve nicknames
+        const hd2Leaderboard = await resolveNicknames(hd2Rows, guild);
+        const regimentLeaderboard = await resolveNicknames(regimentRows, guild);
 
-        console.log('[DEBUG] Leaderboards filtered.');
+        console.log('[DEBUG] Nicknames resolved.');
 
-        const embed = createLeaderboardEmbed(category, hd2Leaderboard, regimentLeaderboard);
+        // Fetch user rank
+        const userCareerRank = await getUserRank(userId, category, 'service_reports');
+        const userRegimentRank = await getUserRank(userId, category, 'player_contributions');
+
+        const embed = createLeaderboardEmbed(category, hd2Leaderboard, regimentLeaderboard, {
+            userCareerRank,
+            userRegimentRank,
+        });
 
         // Cache the result
         leaderboardCache.set(cacheKey, { embed, timestamp: Date.now() });
