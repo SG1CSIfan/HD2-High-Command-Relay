@@ -36,54 +36,45 @@ function splitContentIntoFields(content, maxLength = 1024) {
     return fields;
 }
 
-function createLeaderboardEmbed(category, hd2Leaderboard, regimentLeaderboard, userRanks) {
-    // Filter out "Unknown" users
-    const filteredHD2Leaderboard = hd2Leaderboard.filter(entry => entry.nickname !== 'Unknown');
-    const filteredRegimentLeaderboard = regimentLeaderboard.filter(entry => entry.nickname !== 'Unknown');
+function createLeaderboardEmbed(category, hd2Leaderboard, regimentLeaderboard, ranks) {
+    const maxUsernameLength = 20; // Limit usernames to 20 characters
+
+    const truncateUsername = (username) => {
+        return username.length > maxUsernameLength
+            ? `${username.slice(0, maxUsernameLength)}...`
+            : username;
+    };
+
+    const formatUsernames = (leaderboard) =>
+        leaderboard.map((entry, index) => {
+            const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ` ${index + 1}`.padStart(3);
+            return `${rankEmoji} ${truncateUsername(entry.nickname)}`;
+        });
+
+    const formatKills = (leaderboard) => leaderboard.map((entry) => `${entry.kills.toLocaleString()}`);
 
     const embed = new EmbedBuilder()
         .setTitle(`🏆 Leader Board - ${category.replace(/([A-Z])/g, ' $1')}`)
         .setDescription(`Leader Board of the 1st Colonial Regiment\nInformation for ${category}`)
+        .addFields(
+            // Career Page group
+            { name: 'Helldivers (Career Page)', value: `\`\`\`\n${formatUsernames(hd2Leaderboard).join('\n')}\`\`\``, inline: true },
+            { name: 'Kills (Career Page)', value: `\`\`\`\n${formatKills(hd2Leaderboard).join('\n')}\`\`\``, inline: true },
+            { name: '\u200B', value: '\u200B', inline: false }, // Blank spacer
+
+            // 1st Regiment group
+            { name: 'Helldivers (1st Regiment)', value: `\`\`\`\n${formatUsernames(regimentLeaderboard).join('\n')}\`\`\``, inline: true },
+            { name: 'Kills (1st Regiment)', value: `\`\`\`\n${formatKills(regimentLeaderboard).join('\n')}\`\`\``, inline: true },
+            { name: '\u200B', value: '\u200B', inline: false } // Blank spacer
+        )
+        .addFields({
+            name: 'Your Rank',
+            value: `You are #${ranks.userCareerRank} in Career Page and #${ranks.userRegimentRank} in 1st Regiment.`,
+            inline: false,
+        })
         .setColor('#00b0f4')
         .setFooter({ text: '1st Colonial Regiment | HD2 Service Report Bot' })
         .setTimestamp();
-
-    // Add HD2 Career Page fields
-    embed.addFields(
-        { name: 'HD2 Career Page', value: '** **', inline: false },
-        {
-            name: 'Helldivers',
-            value: `\`\`\`${formatLeaderboard(filteredHD2Leaderboard)}\`\`\``,
-            inline: true,
-        },
-        {
-            name: 'HD2 Career',
-            value: `\`\`\`${formatKills(filteredHD2Leaderboard)}\`\`\``,
-            inline: true,
-        }
-    );
-
-    // Add 1st Regiment fields
-    embed.addFields(
-        { name: '1st Regiment', value: '** **', inline: false },
-        {
-            name: 'Helldivers',
-            value: `\`\`\`${formatLeaderboard(filteredRegimentLeaderboard)}\`\`\``,
-            inline: true,
-        },
-        {
-            name: '1st Regiment',
-            value: `\`\`\`${formatKills(filteredRegimentLeaderboard)}\`\`\``,
-            inline: true,
-        }
-    );
-
-    // Add user rank
-    embed.addFields({
-        name: 'Your Rank',
-        value: `You are #${userRanks.userCareerRank || 'N/A'} in Career Page and #${userRanks.userRegimentRank || 'N/A'} in 1st Regiment.`,
-        inline: false,
-    });
 
     return embed;
 }
