@@ -20,25 +20,23 @@ async function getUserRank(userId, category, tableName) {
 
 // Function to resolve nicknames
 async function resolveNicknames(rows, guild) {
-    return (
-        await Promise.all(
-            rows.map(async (row) => {
-                try {
-                    let member = guild.members.cache.get(row.userId);
-                    if (!member) {
-                        member = await guild.members.fetch(row.userId).catch(() => null);
-                    }
-                    const nickname = member?.nickname || member?.user?.username;
-                    return nickname
-                        ? { nickname, kills: row.kills }
-                        : null; // Return null for invalid nicknames
-                } catch (error) {
-                    console.error(`[ERROR] Failed to fetch member for userId: ${row.userId}`, error);
-                    return null; // Return null for errors
+    const members = await Promise.all(
+        rows.map(async (row) => {
+            try {
+                let member = guild.members.cache.get(row.userId);
+                if (!member) {
+                    member = await guild.members.fetch(row.userId).catch(() => null);
                 }
-            })
-        )
-    ).filter((entry) => entry !== null); // Filter out null entries
+                const nickname = member?.nickname || member?.user?.username;
+                return nickname ? { nickname, kills: row.kills } : null;
+            } catch {
+                return null;
+            }
+        })
+    );
+
+    // Filter and return only top 10 active users
+    return members.filter((entry) => entry && entry.kills > 0).slice(0, 10);
 }
 
 // Function to get leaderboard data
