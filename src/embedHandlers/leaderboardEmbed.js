@@ -37,29 +37,32 @@ function splitContentIntoFields(content, maxLength = 1024) {
 }
 
 function createLeaderboardEmbed(category, hd2Leaderboard, regimentLeaderboard, ranks) {
-    const maxUsernameLength = 20; // Limit usernames to 20 characters
     const maxFieldLength = 1024; // Discord embed field limit
+    const maxLineLength = 50; // Limit each line to a maximum length
 
-    const truncateUsername = (username) => {
-        return username.length > maxUsernameLength
-            ? `${username.slice(0, maxUsernameLength)}...`
-            : username;
-    };
+    // Function to truncate individual lines
+    const truncateLine = (line) =>
+        line.length > maxLineLength ? `${line.slice(0, maxLineLength)}...` : line;
 
+    // Format leaderboard usernames
     const formatUsernames = (leaderboard) =>
         leaderboard.map((entry, index) => {
-            const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ` ${index + 1}`.padStart(3);
-            return `${rankEmoji} ${truncateUsername(entry.nickname)}`;
+            const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`.padStart(3);
+            return `${rankEmoji} ${truncateLine(entry.nickname)}`;
         });
 
-    const formatKills = (leaderboard) => leaderboard.map((entry) => `${entry.kills.toLocaleString()}`);
+    // Format kills
+    const formatKills = (leaderboard) =>
+        leaderboard.map((entry) => entry.kills.toLocaleString());
 
-    const splitFields = (title, values) => {
+    // Function to split content into multiple fields
+    const splitFields = (title, lines) => {
         const fields = [];
         let currentChunk = [];
 
-        values.forEach((line) => {
-            if (currentChunk.join('\n').length + line.length + 1 > maxFieldLength) {
+        lines.forEach((line) => {
+            const combinedLength = currentChunk.join('\n').length + line.length + 1;
+            if (combinedLength > maxFieldLength) {
                 fields.push({ name: title, value: `\`\`\`\n${currentChunk.join('\n')}\`\`\``, inline: true });
                 currentChunk = [];
             }
@@ -82,9 +85,9 @@ function createLeaderboardEmbed(category, hd2Leaderboard, regimentLeaderboard, r
     const embed = new EmbedBuilder()
         .setTitle(`🏆 Leader Board - ${category.replace(/([A-Z])/g, ' $1')}`)
         .setDescription(`Leader Board of the 1st Colonial Regiment\nInformation for ${category}`)
-        .addFields([...hd2UserFields, ...hd2KillFields])
-        .addFields({ name: '\u200B', value: '\u200B', inline: false }) // Blank spacer
-        .addFields([...regimentUserFields, ...regimentKillFields])
+        .addFields([...hd2UserFields, ...hd2KillFields]) // Add Career Page fields
+        .addFields({ name: '\u200B', value: '\u200B', inline: false }) // Spacer
+        .addFields([...regimentUserFields, ...regimentKillFields]) // Add 1st Regiment fields
         .addFields({
             name: 'Your Rank',
             value: `You are #${ranks.userCareerRank} in Career Page and #${ranks.userRegimentRank} in 1st Regiment.`,
