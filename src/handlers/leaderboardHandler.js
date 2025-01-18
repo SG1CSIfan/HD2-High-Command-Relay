@@ -20,23 +20,25 @@ async function getUserRank(userId, category, tableName) {
 
 // Function to resolve nicknames
 async function resolveNicknames(rows, guild) {
-    return await Promise.all(
-        rows.map(async (row) => {
-            try {
-                let member = guild.members.cache.get(row.userId);
-                if (!member) {
-                    member = await guild.members.fetch(row.userId).catch(() => null);
+    return (
+        await Promise.all(
+            rows.map(async (row) => {
+                try {
+                    let member = guild.members.cache.get(row.userId);
+                    if (!member) {
+                        member = await guild.members.fetch(row.userId).catch(() => null);
+                    }
+                    const nickname = member?.nickname || member?.user?.username;
+                    return nickname
+                        ? { nickname, kills: row.kills }
+                        : null; // Return null for invalid nicknames
+                } catch (error) {
+                    console.error(`[ERROR] Failed to fetch member for userId: ${row.userId}`, error);
+                    return null; // Return null for errors
                 }
-                return {
-                    nickname: member?.nickname || member?.user?.username || `Unknown (${row.userId})`,
-                    kills: row.kills,
-                };
-            } catch (error) {
-                console.error(`[ERROR] Failed to fetch member for userId: ${row.userId}`, error);
-                return { nickname: `Unknown (${row.userId})`, kills: row.kills };
-            }
-        })
-    );
+            })
+        )
+    ).filter((entry) => entry !== null); // Filter out null entries
 }
 
 // Function to get leaderboard data
